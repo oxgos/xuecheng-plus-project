@@ -8,6 +8,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>xuecheng-plus-content-service</artifactId>
+
     <dependencies>
         <dependency>
             <groupId>com.xuecheng</groupId>
