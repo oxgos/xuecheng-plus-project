@@ -9,6 +9,7 @@ import com.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.xuecheng.content.model.po.CourseBase;
 import com.xuecheng.content.service.CourseBaseInfoService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -27,24 +28,26 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         // 详细进行分页查询的单元测试
         // 拼装查询条件
         LambdaQueryWrapper<CourseBase> queryWrapper = new LambdaQueryWrapper<>();
-        // 根据名称模糊查询,在sql中拼接course_base.name like '%值%'
-        queryWrapper.like(
-                StringUtils.isNotEmpty(queryCourseParamsDto.getCourseName()),
-                CourseBase::getName,
-                queryCourseParamsDto.getCourseName()
-        );
-        // 根据课程审核状态查询 course_base.audit_status = ?
-        queryWrapper.eq(
-                StringUtils.isNotEmpty(queryCourseParamsDto.getAuditStatus()),
-                CourseBase::getAuditStatus,
-                queryCourseParamsDto.getAuditStatus()
-        );
-        // 根据课程发布状态查询
-        queryWrapper.eq(
-                StringUtils.isNotEmpty(queryCourseParamsDto.getPublishStatus()),
-                CourseBase::getStatus,
-                queryCourseParamsDto.getPublishStatus()
-        );
+        if (ObjectUtils.isNotEmpty(queryCourseParamsDto)) {
+            // 根据名称模糊查询,在sql中拼接course_base.name like '%值%'
+            queryWrapper.like(
+                    StringUtils.isNotEmpty(queryCourseParamsDto.getCourseName()),
+                    CourseBase::getName,
+                    queryCourseParamsDto.getCourseName()
+            );
+            // 根据课程审核状态查询 course_base.audit_status = ?
+            queryWrapper.eq(
+                    StringUtils.isNotEmpty(queryCourseParamsDto.getAuditStatus()),
+                    CourseBase::getAuditStatus,
+                    queryCourseParamsDto.getAuditStatus()
+            );
+            // 根据课程发布状态查询
+            queryWrapper.eq(
+                    StringUtils.isNotEmpty(queryCourseParamsDto.getPublishStatus()),
+                    CourseBase::getStatus,
+                    queryCourseParamsDto.getPublishStatus()
+            );
+        }
         // 创建page分页参数对象,参数：当前页码，每页记录数
         Page<CourseBase> page = new Page(pageParams.getPageNo(), pageParams.getPageSize());
 
@@ -57,4 +60,5 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         PageResult<CourseBase> pageResult = new PageResult<>(records, total, courseBasePage.getCurrent(), courseBasePage.getSize());
         return pageResult;
     }
+
 }
