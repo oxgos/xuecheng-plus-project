@@ -7,3 +7,26 @@ Content-Type: application/json
   "courseName": "java",
   "publishStatus": ""
 }
+
+### 创建课程
+POST {{content_host}}/content/course
+Content-Type: application/json
+
+{
+  "charge": "201001",
+  "price": 80,
+  "originalPrice": 100,
+  "qq": "22333",
+  "wechat": "223344",
+  "phone": "13333333",
+  "validDays": 365,
+  "mt": "1-1",
+  "st": "1-1-1",
+  "name": "java网络编辑高级01-20",
+  "pic": "sdfsdfsd",
+  "teachmode": "200002",
+  "users": "初级人员",
+  "tags": "dfgdfgfdgfd",
+  "grade": "204001",
+  "description": "java网络编辑高级"
+}
