@@ -26,7 +26,11 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
         //将list转map,以备使用,排除根节点
         Map<String, CourseCategoryTreeDto> mapTemp = courseCategoryTreeDtos.stream()
                 .filter(item->!id.equals(item.getId()))
+                // toMap3个参数: 1.指定key 2.指定value 3.重复key的处理方法
                 .collect(Collectors.toMap(key -> key.getId(), value -> value, (key1, key2) -> key2));
+
+        courseCategoryTreeDtos.stream().filter(item->!id.equals(item.getId()));
+
         //最终返回的list
         List<CourseCategoryTreeDto> categoryTreeDtos = new ArrayList<>();
         //依次遍历每个元素,排除根节点
