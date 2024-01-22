@@ -1,0 +1,4 @@
+
+### 根据id查询课程
+GET {{content_host}}/content/teachplan/117/tree-nodes
+Content-Type: application/json
