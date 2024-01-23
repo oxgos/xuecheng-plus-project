@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PageParams {
 
-    @ApiModelProperty("当前页码")
+    @ApiModelProperty(value = "当前页码", example = "1")
     private Long pageNo = 1L;
 
-    @ApiModelProperty("每页记录数默认值")
-    private Long pageSize =10L;
+    @ApiModelProperty(value = "每页记录数默认值", example = "10")
+    private Long pageSize = 10L;
 }

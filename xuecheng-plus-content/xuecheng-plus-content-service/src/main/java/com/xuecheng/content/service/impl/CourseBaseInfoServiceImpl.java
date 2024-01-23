@@ -178,6 +178,12 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         return courseBaseInfoDto;
     }
 
+    /**
+     * 课程信息
+     * @param companyId
+     * @param editCourseDto 课程信息
+     * @return
+     */
     @Transactional
     @Override
     public CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto) {

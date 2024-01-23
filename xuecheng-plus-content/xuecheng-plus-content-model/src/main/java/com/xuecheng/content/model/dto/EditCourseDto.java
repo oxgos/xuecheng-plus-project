@@ -8,7 +8,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 @Data
-@ApiModel(value="EditCourseDto", description="修改课程基本信息")
+@ApiModel(value="修改课程基本信息参数", description="修改课程基本信息参数")
 public class EditCourseDto extends AddCourseDto {
 
     @NotNull(message = "课程id不能为空", groups = {ValidationGroups.Update.class})
