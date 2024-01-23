@@ -2,3 +2,48 @@
 ### 根据id查询课程
 GET {{content_host}}/content/teachplan/117/tree-nodes
 Content-Type: application/json
+
+### 新增课程计划--章
+POST {{content_host}}/content/teachplan
+Content-Type: application/json
+
+{
+  "courseId" : 117,
+  "parentid": 0,
+  "grade" : 1,
+  "pname" : "新章名称 [点击修改]"
+}
+
+### 新增课程计划--节,从数据库找到第一级的课程计划id向其下边添加计划
+POST {{content_host}}/content/teachplan
+Content-Type: application/json
+
+{
+  "courseId" : 117,
+  "parentid": 274,
+  "grade" : 2,
+  "pname" : "小节名称 [点击修改]"
+}
+
+### 课程课程计划,需要从数据库找到修改的课程计划id
+POST {{content_host}}/content/teachplan
+Content-Type: application/json
+
+{
+  "changeDate" : null,
+  "courseId" : 117,
+  "cousePubId" : null,
+  "createDate" : null,
+  "ctlBarShow" : false,
+  "ctlEditTitle" : true,
+  "endTime" : null,
+  "grade" : "2",
+  "isPreview" : "1",
+  "mediaType" : "",
+  "orderby" : 1,
+  "parentid" : 292,
+  "pname" : "第1节修改名称",
+  "startTime" : null,
+  "status" : null,
+  "teachPlanId" : 295
+}
