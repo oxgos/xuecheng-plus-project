@@ -1,0 +1,4 @@
+
+### 根据课程id查询老师列表
+GET {{content_host}}/content/courseTeacher/list/72
+Content-Type: application/json
