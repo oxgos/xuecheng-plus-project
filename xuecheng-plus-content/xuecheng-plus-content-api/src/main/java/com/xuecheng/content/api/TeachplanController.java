@@ -35,4 +35,17 @@ public class TeachplanController {
     public void saveTeachplan(@RequestBody @Validated SaveTeachplanDto teachplan){
         teachplanService.saveTeachplan(teachplan);
     }
+
+    @ApiOperation("课程计划删除")
+    @ApiImplicitParam(value = "treeplanId", name = "课程计划Id", required = true, dataType = "Long", paramType = "path", example = "1")
+    @DeleteMapping("/{treeplanId}")
+    public void deleteTeachplan(@PathVariable Long treeplanId){
+        teachplanService.deleteTeachplan(treeplanId);
+    }
+
+    @ApiOperation("课程计划移动")
+    @PostMapping("/{direction}/{treeplanId}")
+    public void moveTeachplan(@PathVariable String direction, @PathVariable Long treeplanId){
+        teachplanService.moveTeachplan(direction, treeplanId);
+    }
 }

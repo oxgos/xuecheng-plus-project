@@ -47,3 +47,16 @@ Content-Type: application/json
   "status" : null,
   "teachPlanId" : 295
 }
+
+### 课程课程计划删除
+DELETE {{content_host}}/content/teachplan/272
+Content-Type: application/json
+
+
+### 课程计划向上移动
+POST {{content_host}}/content/teachplan/moveup/272
+Content-Type: application/json
+
+### 课程计划向下移动
+POST {{content_host}}/content/teachplan/movedown/271
+Content-Type: application/json
