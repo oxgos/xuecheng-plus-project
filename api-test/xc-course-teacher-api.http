@@ -14,3 +14,7 @@ Content-Type: application/json
   "position": "Java教师",
   "photograph": ""
 }
+
+### 删除教师
+DELETE {{content_host}}/content/courseTeacher/course/117/29
+Content-Type: application/json

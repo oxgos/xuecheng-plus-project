@@ -6,11 +6,13 @@ import com.xuecheng.content.model.po.CourseTeacher;
 import com.xuecheng.content.service.CourseTeacherService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -33,5 +35,15 @@ public class CourseTeacherController {
     @PostMapping()
     public void saveCourseTeacher(@RequestBody @Validated SaveCourseTeacherDto dto) {
         courseTeacherService.saveCourseTeacher(dto);
+    }
+
+    @ApiOperation("删除课程教师")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "courseId", name = "课程id", required = true, dataType = "Long", paramType = "path", example = "1"),
+            @ApiImplicitParam(value = "teacherId", name = "教师id", required = true, dataType = "Long", paramType = "path", example = "1"),
+    })
+    @DeleteMapping("/course/{courseId}/{teacherId}")
+    public void deleteCourseTeacher(@PathVariable Long courseId, @PathVariable Long teacherId) {
+        courseTeacherService.deleteCourseTeacher(courseId, teacherId);
     }
 }

@@ -10,4 +10,6 @@ public interface CourseTeacherService {
     public List<CourseTeacher> queryCourseTeacherList(Long courseId);
 
     public void saveCourseTeacher(SaveCourseTeacherDto dto);
+
+    public void deleteCourseTeacher(Long courseId, Long teacherId);
 }

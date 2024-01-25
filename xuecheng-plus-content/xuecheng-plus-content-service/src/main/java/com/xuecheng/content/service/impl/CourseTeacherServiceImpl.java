@@ -33,4 +33,11 @@ public class CourseTeacherServiceImpl implements CourseTeacherService {
         BeanUtils.copyProperties(dto, courseTeacher);
         courseTeacherMapper.insert(courseTeacher);
     }
+
+    @Override
+    public void deleteCourseTeacher(Long courseId, Long teacherId) {
+        LambdaQueryWrapper<CourseTeacher> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(CourseTeacher::getCourseId, courseId).eq(CourseTeacher::getId, teacherId);
+        courseTeacherMapper.delete(queryWrapper);
+    }
 }
