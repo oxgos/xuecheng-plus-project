@@ -15,6 +15,19 @@ Content-Type: application/json
   "photograph": ""
 }
 
+### 修改教师
+POST {{content_host}}/content/courseTeacher
+Content-Type: application/json
+
+{
+  "id": 29,
+  "courseId": 117,
+  "teacherName": "红五",
+  "introduction": "高级课程",
+  "position": "Java教师",
+  "photograph": ""
+}
+
 ### 删除教师
 DELETE {{content_host}}/content/courseTeacher/course/117/29
 Content-Type: application/json

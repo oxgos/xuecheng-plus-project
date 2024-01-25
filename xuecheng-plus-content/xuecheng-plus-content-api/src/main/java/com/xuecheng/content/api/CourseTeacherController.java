@@ -31,7 +31,7 @@ public class CourseTeacherController {
         return courseTeachers;
     }
 
-    @ApiOperation("新增课程教师")
+    @ApiOperation("新增、修改课程教师")
     @PostMapping()
     public void saveCourseTeacher(@RequestBody @Validated SaveCourseTeacherDto dto) {
         courseTeacherService.saveCourseTeacher(dto);
