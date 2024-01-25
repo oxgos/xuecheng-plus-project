@@ -125,6 +125,20 @@ public class TeachplanServiceImpl implements TeachplanService {
 
     }
 
+    /**
+     * 删除课程下所有课程计划
+     * @param courseId
+     */
+    public void deleteAllTeachPLan(Long courseId) {
+        LambdaQueryWrapper<TeachplanMedia> queryWrapper1 = new LambdaQueryWrapper<>();
+        queryWrapper1.eq(TeachplanMedia::getCourseId, courseId);
+        teachplanMediaMapper.delete(queryWrapper1);
+
+        LambdaQueryWrapper<Teachplan> queryWrapper2 = new LambdaQueryWrapper<>();
+        queryWrapper2.eq(Teachplan::getCourseId, courseId);
+        teachplanMapper.delete(queryWrapper2);
+    }
+
     private void deleteTeachPLanMedia(Long treeplanId) {
         LambdaQueryWrapper<TeachplanMedia> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(TeachplanMedia::getTeachplanId, treeplanId);

@@ -9,7 +9,7 @@ public interface CourseTeacherService {
 
     public List<CourseTeacher> queryCourseTeacherList(Long courseId);
 
-    public void saveCourseTeacher(SaveCourseTeacherDto dto);
+    public CourseTeacher saveCourseTeacher(Long companyId, SaveCourseTeacherDto dto);
 
     public void deleteCourseTeacher(Long courseId, Long teacherId);
 }

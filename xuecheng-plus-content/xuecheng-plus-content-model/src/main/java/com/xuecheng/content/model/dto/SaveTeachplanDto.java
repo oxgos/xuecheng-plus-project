@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -31,7 +30,7 @@ public class SaveTeachplanDto {
     /**
      * 课程计划父级Id
      */
-    @NotEmpty(message = "课程计划父级Id不能为空")
+    @NotNull(message = "课程计划父级Id不能为空")
     @ApiModelProperty(value = "课程计划父级Id", required = true)
     private Long parentid;
 
@@ -52,7 +51,7 @@ public class SaveTeachplanDto {
     /**
      * 课程标识
      */
-    @NotEmpty(message = "课程标识不能为空")
+    @NotNull(message = "课程标识不能为空")
     @ApiModelProperty(value = "课程标识", required = true)
     private Long courseId;
 

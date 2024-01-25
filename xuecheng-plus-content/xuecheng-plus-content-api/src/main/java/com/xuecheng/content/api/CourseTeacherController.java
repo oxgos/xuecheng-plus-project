@@ -33,8 +33,11 @@ public class CourseTeacherController {
 
     @ApiOperation("新增、修改课程教师")
     @PostMapping()
-    public void saveCourseTeacher(@RequestBody @Validated SaveCourseTeacherDto dto) {
-        courseTeacherService.saveCourseTeacher(dto);
+    public CourseTeacher saveCourseTeacher(@RequestBody @Validated SaveCourseTeacherDto dto) {
+        // 获取用户所属机构的id
+        Long companyId = 1232141425L;
+        CourseTeacher courseTeacher = courseTeacherService.saveCourseTeacher(companyId, dto);
+        return courseTeacher;
     }
 
     @ApiOperation("删除课程教师")

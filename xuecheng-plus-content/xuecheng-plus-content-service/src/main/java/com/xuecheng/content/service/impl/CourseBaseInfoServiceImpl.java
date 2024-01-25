@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
+import com.xuecheng.content.components.CourseCompanyValidator;
 import com.xuecheng.content.mapper.CourseBaseMapper;
 import com.xuecheng.content.mapper.CourseCategoryMapper;
 import com.xuecheng.content.mapper.CourseMarketMapper;
+import com.xuecheng.content.mapper.CourseTeacherMapper;
 import com.xuecheng.content.model.dto.AddCourseDto;
 import com.xuecheng.content.model.dto.CourseBaseInfoDto;
 import com.xuecheng.content.model.dto.EditCourseDto;
@@ -39,6 +41,15 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
 
     @Resource
     CourseCategoryMapper courseCategoryMapper;
+
+    @Resource
+    CourseCompanyValidator courseCompanyValidator;
+
+    @Resource
+    TeachplanServiceImpl teachplanService;
+
+    @Resource
+    CourseTeacherServiceImpl courseTeacherService;
 
     @Override
     public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
@@ -189,14 +200,7 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     public CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto) {
 
         Long courseId = editCourseDto.getId();
-        CourseBase courseBase = courseBaseMapper.selectById(courseId);
-        if (courseBase == null) {
-            XueChengPlusException.cast("课程不存在");
-        }
-        // 校验本机构只能修改本机构的课程
-        if (!courseBase.getCompanyId().equals(companyId)) {
-            XueChengPlusException.cast("本机构只能修改本机构的课程");
-        }
+        CourseBase courseBase = courseCompanyValidator.checkIsSameCompany(companyId, courseId);
 
         // 封装基本信息的数据
         BeanUtils.copyProperties(editCourseDto, courseBase);
@@ -204,7 +208,7 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         //更新课程基本信息
         int i = courseBaseMapper.updateById(courseBase);
         if (i <= 0) {
-            XueChengPlusException.cast("修改课程失败0");
+            XueChengPlusException.cast("修改课程失败");
         }
 
         // 封装营销信息的数据
@@ -215,6 +219,14 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         //查询课程信息
         CourseBaseInfoDto courseBaseInfo = this.getCourseBaseInfo(courseId);
         return courseBaseInfo;
+    }
+
+    @Transactional
+    @Override
+    public void deleteCourseBase(Long courseId) {
+        courseTeacherService.deleteAllCourseTeacher(courseId);
+        teachplanService.deleteAllTeachPLan(courseId);
+        courseBaseMapper.deleteById(courseId);
     }
 
     // 单独写一个方法保存营销信息，逻辑：存在则更新，不存在则添加

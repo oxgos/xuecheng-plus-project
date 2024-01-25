@@ -40,5 +40,7 @@ public interface CourseBaseInfoService {
      * @param editCourseDto 课程信息
      * @return 课程详细信息
      */
-    CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto);
+    public CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto);
+
+    public void deleteCourseBase(Long courseId);
 }

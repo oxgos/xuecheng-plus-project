@@ -53,3 +53,7 @@ Content-Type: application/json
   "charge": "201001",
   "price": 0.01
 }
+
+### 删除课程
+DELETE {{content_host}}/content/course/26
+Content-Type: application/json
