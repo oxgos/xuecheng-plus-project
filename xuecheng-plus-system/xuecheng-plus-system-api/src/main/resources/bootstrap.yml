@@ -1,24 +1,37 @@
-server:
-  servlet:
-    context-path: /system
-  port: 63110
+#server:
+#  servlet:
+#    context-path: /system
+#  port: 63110
 #微服务配置
 spring:
   application:
     name: system-api
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.164.132:3306/xcplus_system?serverTimezone=UTC&userUnicode=true&useSSL=false&
-    username: root
-    password: 123
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      server-addr: 192.168.164.132:8848
+      discovery:
+        namespace: 30ecb08a-b195-4c7c-a7b1-5817b45776b6
+        group: xuecheng-plus-project
+      config:
+        namespace: 30ecb08a-b195-4c7c-a7b1-5817b45776b6
+        group: xuecheng-plus-project
+        file-extension: yaml
+        refresh-enabled: true
+  #  datasource:
+  #    driver-class-name: com.mysql.cj.jdbc.Driver
+  #    url: jdbc:mysql://192.168.164.132:3306/xcplus_system?serverTimezone=UTC&userUnicode=true&useSSL=false&
+  #    username: root
+  #    password: 123
 # 日志文件配置路径
 logging:
   config: classpath:log4j2-dev.xml
 
 # swagger 文档配置
-swagger:
-  title: "学成在线系统管理"
-  description: "系统管理接口"
-  base-package: com.xuecheng.system
-  enabled: true
-  version: 1.0.0
+#swagger:
+#  title: "学成在线系统管理"
+#  description: "系统管理接口"
+#  base-package: com.xuecheng.system
+#  enabled: true
+#  version: 1.0.0
