@@ -19,6 +19,10 @@ spring:
         group: xuecheng-plus-project
         file-extension: yaml
         refresh-enabled: true
+        extension-configs:
+          - data-id: system-service-${spring.profiles.active}.yaml
+            group: xuecheng-plus-project
+            refresh: true
         shared-configs:
           - data-id: swagger-${spring.profiles.active}.yaml
             group: xuecheng-plus-common
