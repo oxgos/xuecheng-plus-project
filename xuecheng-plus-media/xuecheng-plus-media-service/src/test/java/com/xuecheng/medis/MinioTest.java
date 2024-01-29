@@ -77,12 +77,12 @@ public class MinioTest {
                 .bucket("testbucket")
                 .object("test/复审.txt")
                 .build();
-
-
-        try {
-            // 查询远程服务获取到一个流对象
-            FilterInputStream inputStream = minioClient.getObject(getObjectArgs);
-            FileOutputStream outputStream = new FileOutputStream(new File("/Users/gavin_guo/Desktop/复审_2.txt"));
+        try (
+                // 查询远程服务获取到一个流对象
+                FilterInputStream inputStream = minioClient.getObject(getObjectArgs);
+                FileOutputStream outputStream = new FileOutputStream(new File("/Users/gavin_guo/Desktop/复审_2.txt"));
+                FileInputStream fileInputStream2 = new FileInputStream(new File("/Users/gavin_guo/Desktop/复审_2.txt"));
+                ) {
             IOUtils.copy(inputStream, outputStream);
 
             StatObjectArgs testbucket = StatObjectArgs.builder()
@@ -94,17 +94,10 @@ public class MinioTest {
             String source_md5 = statObjectResponse.etag();
 
             // 校验文件的完整性对文件的内容进行md5
-
-            // 正确做法是: 上传文件的时候记录上传文件的md5，再和下载时候作比较，或者用eTag作用比(eTag实际上是md5)
-            // FileInputStream fileInputStream1 = new FileInputStream(new File("/Users/gavin_guo/Desktop/复审.txt"));
-            // String source_md5 = DigestUtils.md5Hex(fileInputStream1);
-
-            FileInputStream fileInputStream2 = new FileInputStream(new File("/Users/gavin_guo/Desktop/复审_2.txt"));
             String local_md5 = DigestUtils.md5Hex(fileInputStream2);
             if (source_md5.equals(local_md5)) {
                 System.out.println("下载成功");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
