@@ -6,9 +6,6 @@ import com.xuecheng.media.model.dto.QueryMediaParamsDto;
 import com.xuecheng.media.model.dto.UploadFileParamsDto;
 import com.xuecheng.media.model.dto.UploadFileResultDto;
 import com.xuecheng.media.model.po.MediaFiles;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.List;
 
 /**
  * @author Mr.M
@@ -37,4 +34,15 @@ public interface MediaFileService {
      * @return 文件信息
      */
     public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String localFilePath);
+
+    /**
+     * 将文件信息添加到文件表
+     * @param companyId
+     * @param fileMd5
+     * @param uploadFileParamsDto
+     * @param bucket
+     * @param objectName
+     * @return MediaFiles
+     */
+    public MediaFiles addMediaFilesToDb(Long companyId, String fileMd5, UploadFileParamsDto uploadFileParamsDto, String bucket, String objectName);
 }

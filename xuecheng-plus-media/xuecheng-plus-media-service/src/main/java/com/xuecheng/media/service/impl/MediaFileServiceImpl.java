@@ -44,6 +44,9 @@ public class MediaFileServiceImpl implements MediaFileService {
     @Resource
     MinioClient minioClient;
 
+    @Resource
+    MediaFileService currentProxy;
+
     // 存储普通文件
     @Value("${minio.bucket.files}")
     private String bucket_mediafiles;
@@ -72,7 +75,8 @@ public class MediaFileServiceImpl implements MediaFileService {
 
     }
 
-    @Transactional
+    // 因为这方法有通过网络上传文件到minio，可能会很慢，导致数据库阻塞，占用数据库资源，所以不在这里添加@Transactional，而在addMediaFilesToDb添加
+    // @Transactional
     @Override
     public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String localFilePath) {
 
@@ -94,7 +98,7 @@ public class MediaFileServiceImpl implements MediaFileService {
             XueChengPlusException.cast("上传文件失败");
         }
         // 入库文件信息
-        MediaFiles mediaFiles = addMediaFilesToDb(companyId, fileMd5, uploadFileParamsDto, bucket_mediafiles, objectName);
+        MediaFiles mediaFiles = currentProxy.addMediaFilesToDb(companyId, fileMd5, uploadFileParamsDto, bucket_mediafiles, objectName);
         if (mediaFiles == null) {
             XueChengPlusException.cast("文件上传后保存信息失败");
         }
@@ -114,7 +118,8 @@ public class MediaFileServiceImpl implements MediaFileService {
      * @return com.xuecheng.media.model.po.MediaFiles
      * @description 将文件信息添加到文件表
      */
-    private MediaFiles addMediaFilesToDb(Long companyId, String fileMd5, UploadFileParamsDto uploadFileParamsDto, String bucket, String objectName) {
+    @Transactional
+    public MediaFiles addMediaFilesToDb(Long companyId, String fileMd5, UploadFileParamsDto uploadFileParamsDto, String bucket, String objectName) {
         // 将文件信息保存到数据库
         MediaFiles mediaFiles = mediaFilesMapper.selectById(fileMd5);
         if (mediaFiles == null) {
@@ -140,6 +145,7 @@ public class MediaFileServiceImpl implements MediaFileService {
             mediaFiles.setAuditStatus("002003");
             // 插入数据库
             int insert = mediaFilesMapper.insert(mediaFiles);
+
             if (insert < 0) {
                 log.debug("向数据库保存文件失败, bucket: {}, objectName: {}", bucket, objectName);
                 return null;
