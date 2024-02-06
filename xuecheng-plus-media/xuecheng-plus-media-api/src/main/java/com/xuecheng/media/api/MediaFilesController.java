@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -49,14 +48,14 @@ public class MediaFilesController {
         // 文件类型
         uploadFileParamsDto.setFileType("001001");
         // 在服务器创建一个临时文件，并获取本地路径
-        File tempFile = File.createTempFile("minio", ".temp");
-        fileData.transferTo(tempFile);
-        String localFilePath = tempFile.getAbsolutePath();
+        // File tempFile = File.createTempFile("minio", ".temp");
+        // fileData.transferTo(tempFile);
+        // String localFilePath = tempFile.getAbsolutePath();
 
         Long companyId = 1232141425L;
 
         // 调用service上传图片
-        UploadFileResultDto uploadFileResultDto = mediaFileService.uploadFile(companyId, uploadFileParamsDto, localFilePath);
+        UploadFileResultDto uploadFileResultDto = mediaFileService.uploadFile(companyId, uploadFileParamsDto, fileData);
         return uploadFileResultDto;
     }
 }
