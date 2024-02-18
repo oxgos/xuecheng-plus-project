@@ -56,8 +56,8 @@ public class Mp4VideoUtil extends VideoUtil {
         commend.add("753k");
         commend.add("-r");
         commend.add("18");
-        commend.add(mp4folder_path  + mp4_name);
-//        commend.add(mp4folder_path);
+//        commend.add(mp4folder_path  + mp4_name);
+        commend.add(mp4folder_path);
         String outstring = null;
         try {
             ProcessBuilder builder = new ProcessBuilder();
@@ -72,8 +72,8 @@ public class Mp4VideoUtil extends VideoUtil {
             ex.printStackTrace();
 
         }
-        Boolean check_video_time = this.check_video_time(video_path, mp4folder_path + mp4_name);
-//        Boolean check_video_time = this.check_video_time(video_path, mp4folder_path);
+//        Boolean check_video_time = this.check_video_time(video_path, mp4folder_path + mp4_name);
+        Boolean check_video_time = this.check_video_time(video_path, mp4folder_path);
         if(!check_video_time){
             return outstring;
         }else{

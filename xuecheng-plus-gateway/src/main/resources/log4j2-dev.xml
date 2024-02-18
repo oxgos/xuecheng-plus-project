@@ -38,8 +38,11 @@
         <!--过滤掉spring和mybatis的一些无用的debug信息-->
         <logger name="org.springframework" level="INFO">
         </logger>
-        <logger name="org.mybatis" level="INFO">
+        <logger name="org.mybatis" level="OFF">
         </logger>
+        <logger name="com.alibaba.nacos" level="OFF" />
+        <logger name="org.springframework.cloud.client.discovery" level="OFF" />
+        <logger name="org.springframework.boot.actuate.endpoint" level="OFF" />
         <!--<logger name="cn.itcast.wanxinp2p.consumer.mapper" level="DEBUG">-->
         <!--</logger>-->
 

@@ -9,10 +9,12 @@ import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
 import com.xuecheng.base.model.RestResponse;
 import com.xuecheng.media.mapper.MediaFilesMapper;
+import com.xuecheng.media.mapper.MediaProcessMapper;
 import com.xuecheng.media.model.dto.QueryMediaParamsDto;
 import com.xuecheng.media.model.dto.UploadFileParamsDto;
 import com.xuecheng.media.model.dto.UploadFileResultDto;
 import com.xuecheng.media.model.po.MediaFiles;
+import com.xuecheng.media.model.po.MediaProcess;
 import com.xuecheng.media.service.MediaFileService;
 import io.minio.*;
 import io.minio.messages.DeleteError;
@@ -45,6 +47,9 @@ public class MediaFileServiceImpl implements MediaFileService {
 
     @Resource
     MediaFilesMapper mediaFilesMapper;
+
+    @Resource
+    MediaProcessMapper mediaProcessMapper;
 
     @Resource
     MinioClient minioClient;
@@ -155,8 +160,36 @@ public class MediaFileServiceImpl implements MediaFileService {
                 log.debug("向数据库保存文件失败, bucket: {}, objectName: {}", bucket, objectName);
                 return null;
             }
+
+            // 记录待处理任务
+            addWaitingTask(mediaFiles);
         }
         return mediaFiles;
+    }
+
+    /**
+     * 记录待处理任务
+     * @param mediaFiles
+     */
+    private void addWaitingTask(MediaFiles mediaFiles) {
+        // 通过mimetype判断如果是avi视频才写入待处理任务
+        String filename = mediaFiles.getFilename();
+        // 文件扩展名
+        String extension = filename.substring(filename.lastIndexOf("."));
+        String mimeType = getMimeType(extension);
+        // 如果是avi视频
+        if (mimeType.equals("video/x-msvideo")) {
+            MediaProcess mediaProcess = new MediaProcess();
+            mediaProcess.setFileId(mediaFiles.getFileId());
+            mediaProcess.setFilename(mediaFiles.getFilename());
+            mediaProcess.setBucket(mediaFiles.getBucket());
+            mediaProcess.setFilePath(mediaFiles.getFilePath());
+            // 状态未处理
+            mediaProcess.setStatus("1");
+            mediaProcess.setCreateDate(LocalDateTime.now());
+            mediaProcess.setFailCount(0);
+            mediaProcessMapper.insert(mediaProcess);
+        }
     }
 
     @Override
@@ -176,7 +209,7 @@ public class MediaFileServiceImpl implements MediaFileService {
                 FilterInputStream inputStream = minioClient.getObject(getObjectArgs);
                 if (inputStream != null) {
                     // 文件存在
-                    return RestResponse.success(true);
+                    return RestResponse.validfail("文件已存在");
                 }
                 inputStream.close();
             } catch (Exception e) {
@@ -184,7 +217,7 @@ public class MediaFileServiceImpl implements MediaFileService {
             }
         }
         // 文件不存在
-        return RestResponse.success(false);
+        return RestResponse.success(true);
     }
 
     @Override
@@ -275,11 +308,12 @@ public class MediaFileServiceImpl implements MediaFileService {
             }
             // 文件大小
             uploadFileParamsDto.setFileSize(file.length());
+            file.delete();
         } catch (Exception e) {
             e.printStackTrace();
             return RestResponse.validfail(false, "文件校验失败");
         }
-        // TODO: minio的etag与原文件的不一致
+        // TODO: minio的etag与原文件的不一致()，可能算法不一样
         //        StatObjectArgs testbucket = StatObjectArgs.builder()
         //                .bucket("testbucket")
         //                .object("test/复审.txt")
@@ -357,7 +391,10 @@ public class MediaFileServiceImpl implements MediaFileService {
                     .build());
             //创建临时文件
             minioFile = File.createTempFile("minio", ".merge");
+            // jvm退出时自动删除文件(可以手动删除minioFile.delete())
+            minioFile.deleteOnExit();
             outputStream = new FileOutputStream(minioFile);
+            // 用流把下载的文件复制给临时文件
             IOUtils.copy(stream, outputStream);
             return minioFile;
         } catch (Exception e) {
@@ -446,5 +483,34 @@ public class MediaFileServiceImpl implements MediaFileService {
             XueChengPlusException.cast("上传文件到文件系统失败");
         }
         return false;
+    }
+
+    /**
+     * @description 将文件写入minIO
+     * @param localFilePath  文件地址
+     * @param bucket  桶
+     * @param objectName 对象名称
+     * @return void
+     * @author Mr.M
+     * @date 2022/10/12 21:22
+     */
+    public boolean addMediaFilesToMinIO2(String localFilePath,String mimeType,String bucket, String objectName) {
+        try {
+            UploadObjectArgs testbucket = UploadObjectArgs.builder()
+                    .bucket(bucket)
+                    .object(objectName)
+                    .filename(localFilePath)
+                    .contentType(mimeType)
+                    .build();
+            minioClient.uploadObject(testbucket);
+            log.debug("上传文件到minio成功,bucket:{},objectName:{}",bucket,objectName);
+            System.out.println("上传成功");
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("上传文件到minio出错,bucket:{},objectName:{},错误原因:{}",bucket,objectName,e.getMessage(),e);
+            XueChengPlusException.cast("上传文件到文件系统失败");
+            return false;
+        }
     }
 }

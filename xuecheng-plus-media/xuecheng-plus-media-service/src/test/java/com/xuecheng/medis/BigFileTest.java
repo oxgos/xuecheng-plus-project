@@ -63,7 +63,6 @@ public class BigFileTest {
         File sourceFile = new File("/Users/gavin_guo/Desktop/study-demo/backend/java/test-big-file/01. from the Heart.mp4");
         // 合并后文件
         File mergeFile = new File("/Users/gavin_guo/Desktop/study-demo/backend/java/test-big-file/01. from the Heart_2.mp4");
-
         // 取出所有分块文件
         File[] files = chunkFolder.listFiles();
         if (files != null) {
