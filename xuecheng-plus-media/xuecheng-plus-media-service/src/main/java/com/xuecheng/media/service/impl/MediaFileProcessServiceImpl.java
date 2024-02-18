@@ -55,7 +55,7 @@ public class MediaFileProcessServiceImpl implements MediaFileProcessService {
 
         LambdaQueryWrapper<MediaProcess> queryWrapperById = new LambdaQueryWrapper<MediaProcess>().eq(MediaProcess::getId, taskId);
         // 任务失败
-        if (status.equals('3')) {
+        if (status.equals("3")) {
             MediaProcess mediaProcess_u = new MediaProcess();
             mediaProcess_u.setStatus("3");
             mediaProcess_u.setErrormsg(errorMsg);

@@ -76,9 +76,11 @@ public class VideoJob {
                 File originalFile = null;
                 // 先创建一个临时文件，作为转换后的文件
                 File mp4File = null;
+                Long taskId = null;
+                String fileId = null;
                 try {
                     // 任务id
-                    Long taskId = mediaProcess.getId();
+                    taskId = mediaProcess.getId();
                     // 开启任务
                     boolean b = mediaFileProcessService.startTask(taskId);
                     if (!b) {
@@ -86,7 +88,7 @@ public class VideoJob {
                         return;
                     }
                     // 文件id就是md5
-                    String fileId = mediaProcess.getFileId();
+                    fileId = mediaProcess.getFileId();
                     // 桶
                     String bucket = mediaProcess.getBucket();
                     // objectName
@@ -131,13 +133,16 @@ public class VideoJob {
                     boolean b1 = mediaFileService.addMediaFilesToMinIO2(mp4_path, "video/mp4", bucket, objectName);
                     if (!b1) {
                         log.debug("上传mp4到minio失败, taskId:{}", taskId);
-                        mediaFileProcessService.saveProcessFinishStatus(taskId, "3", fileId, null, "上传mp4到minio失败");
+                        mediaFileProcessService.saveProcessFinishStatus(taskId, "3", fileId, "", "上传mp4到minio失败");
                         return;
                     }
                     //访问url
                     String url = "/" + bucket + "/" + objectName;
                     // 保存任务处理结果
                     mediaFileProcessService.saveProcessFinishStatus(taskId, "2", fileId, url, null);
+                } catch (Exception e) {
+                    log.debug("视频转码任务调度失败, taskId:{}, fileId:{}, 原因:{}, ", taskId, fileId, e.getMessage());
+                    mediaFileProcessService.saveProcessFinishStatus(taskId, "3", fileId, "", e.getMessage());
                 } finally {
                     // 删除临时文件
                     if (originalFile != null) {
