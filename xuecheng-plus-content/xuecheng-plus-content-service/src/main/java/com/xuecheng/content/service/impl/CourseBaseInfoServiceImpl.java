@@ -9,7 +9,6 @@ import com.xuecheng.content.components.CourseCompanyValidator;
 import com.xuecheng.content.mapper.CourseBaseMapper;
 import com.xuecheng.content.mapper.CourseCategoryMapper;
 import com.xuecheng.content.mapper.CourseMarketMapper;
-import com.xuecheng.content.mapper.CourseTeacherMapper;
 import com.xuecheng.content.model.dto.AddCourseDto;
 import com.xuecheng.content.model.dto.CourseBaseInfoDto;
 import com.xuecheng.content.model.dto.EditCourseDto;
@@ -18,6 +17,7 @@ import com.xuecheng.content.model.po.CourseBase;
 import com.xuecheng.content.model.po.CourseCategory;
 import com.xuecheng.content.model.po.CourseMarket;
 import com.xuecheng.content.service.CourseBaseInfoService;
+import com.xuecheng.content.service.TeachplanService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +46,7 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     CourseCompanyValidator courseCompanyValidator;
 
     @Resource
-    TeachplanServiceImpl teachplanService;
+    TeachplanService teachplanService;
 
     @Resource
     CourseTeacherServiceImpl courseTeacherService;
