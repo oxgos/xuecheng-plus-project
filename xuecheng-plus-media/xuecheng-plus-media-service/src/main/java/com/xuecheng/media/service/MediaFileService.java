@@ -119,4 +119,11 @@ public interface MediaFileService {
      * @date 2022/10/12 21:22
      */
     public boolean addMediaFilesToMinIO2(String localFilePath,String mimeType,String bucket, String objectName);
+
+    /**
+     * 获取媒资文件信息
+     * @param mediaId
+     * @return
+     */
+    public MediaFiles getFileById(String mediaId);
 }

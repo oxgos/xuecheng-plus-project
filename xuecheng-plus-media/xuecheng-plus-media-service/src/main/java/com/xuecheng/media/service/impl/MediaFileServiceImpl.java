@@ -70,7 +70,10 @@ public class MediaFileServiceImpl implements MediaFileService {
 
         // 构建查询条件对象
         LambdaQueryWrapper<MediaFiles> queryWrapper = new LambdaQueryWrapper<>();
-
+        queryWrapper
+                .like(MediaFiles::getFilename, queryMediaParamsDto.getFilename())
+                .eq(MediaFiles::getFileType, queryMediaParamsDto.getFileType())
+                .eq(MediaFiles::getAuditStatus, queryMediaParamsDto.getAuditStatus());
         // 分页对象
         Page<MediaFiles> page = new Page<>(pageParams.getPageNo(), pageParams.getPageSize());
         // 查询数据内容获得结果
@@ -409,6 +412,10 @@ public class MediaFileServiceImpl implements MediaFileService {
             }
         }
         return null;
+    }
+
+    public MediaFiles getFileById(String mediaId) {
+        return mediaFilesMapper.selectById(mediaId);
     }
 
     //得到分块文件的目录
