@@ -1,15 +1,29 @@
 package com.xuecheng.content.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.xuecheng.base.exception.XueChengPlusException;
+import com.xuecheng.content.mapper.CourseBaseMapper;
+import com.xuecheng.content.mapper.CourseMarketMapper;
+import com.xuecheng.content.mapper.CoursePublishPreMapper;
 import com.xuecheng.content.model.dto.CourseBaseInfoDto;
 import com.xuecheng.content.model.dto.CoursePreviewDto;
 import com.xuecheng.content.model.dto.TeachplanDto;
+import com.xuecheng.content.model.po.CourseBase;
+import com.xuecheng.content.model.po.CourseMarket;
+import com.xuecheng.content.model.po.CoursePublishPre;
+import com.xuecheng.content.model.po.CourseTeacher;
 import com.xuecheng.content.service.CourseBaseInfoService;
 import com.xuecheng.content.service.CoursePublishService;
+import com.xuecheng.content.service.CourseTeacherService;
 import com.xuecheng.content.service.TeachplanService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -20,10 +34,22 @@ import java.util.List;
 public class CoursePublishServiceImpl implements CoursePublishService {
 
     @Resource
+    CourseBaseMapper courseBaseMapper;
+
+    @Resource
+    CourseMarketMapper courseMarketMapper;
+
+    @Resource
+    CoursePublishPreMapper coursePublishPreMapper;
+
+    @Resource
     CourseBaseInfoService courseBaseInfoService;
 
     @Resource
     TeachplanService teachplanService;
+
+    @Resource
+    CourseTeacherService courseTeacherService;
 
     @Override
     public CoursePreviewDto getCoursePreviewInfo(Long courseId) {
@@ -37,6 +63,73 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         coursePreviewDto.setTeachplans(teachplanTree);
 
         return coursePreviewDto;
+    }
+
+    @Transactional
+    @Override
+    public void commitAudit(Long companyId, Long courseId) {
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        // 课程审核状态
+        String auditStatus = courseBase.getAuditStatus();
+        // 当前审核状态为已提交不允许再次提交
+        if("202003".equals(auditStatus)){
+            XueChengPlusException.cast("当前为等待审核状态，审核完成可以再次提交。");
+        }
+
+        // TODO: 本机构只允许提交本机构的课程
+        if(!courseBase.getCompanyId().equals(companyId)){
+            XueChengPlusException.cast("不允许提交其它机构的课程。");
+        }
+        // 课程图片是否填写
+        if(StringUtils.isEmpty(courseBase.getPic())){
+            XueChengPlusException.cast("提交失败，请上传课程图片");
+        }
+        // 查询课程计划
+        List<TeachplanDto> teachplanTree = teachplanService.findTeachplanTree(courseId);
+        if (teachplanTree == null || teachplanTree.size() == 0) {
+            // 课程计划为空
+            XueChengPlusException.cast("请编写课程计划");
+        }
+        // 查询教师
+        List<CourseTeacher> courseTeachers = courseTeacherService.queryCourseTeacherList(courseId);
+        if (courseTeachers == null || courseTeachers.size() == 0) {
+            // 课程教师为空
+            XueChengPlusException.cast("请添加课程教师");
+        }
+
+        // 查询到课程基本信息、营销信息、计划等信息插入到课程预发布表
+        CoursePublishPre coursePublishPre = new CoursePublishPre();
+        //课程基本信息加部分营销信息
+        CourseBaseInfoDto courseBaseInfo = courseBaseInfoService.getCourseBaseInfo(courseId);
+        BeanUtils.copyProperties(courseBaseInfo, coursePublishPre);
+        // 设置机构id
+        coursePublishPre.setCompanyId(companyId);
+        //课程营销信息
+        CourseMarket courseMarket = courseMarketMapper.selectById(courseId);
+        // 转json
+        // 营销信息
+        String courseMarketJson = JSON.toJSONString(courseMarket);
+        coursePublishPre.setMarket(courseMarketJson);
+        // 课程计划
+        String teachplanTreeString = JSON.toJSONString(teachplanTree);
+        coursePublishPre.setTeachplan(teachplanTreeString);
+        // 教师信息
+        String courseTeachersString = JSON.toJSONString(courseTeachers);
+        coursePublishPre.setTeachers(courseTeachersString);
+        // 状态为已提交
+        coursePublishPre.setStatus("202003");
+        // 创建时间
+        coursePublishPre.setCreateDate(LocalDateTime.now());
+        // 查询预发布表，如果有记录则更新，没有则插入
+        CoursePublishPre coursePublishPreOld = coursePublishPreMapper.selectById(courseId);
+        if (coursePublishPreOld == null) {
+            coursePublishPreMapper.insert(coursePublishPre);
+        } else {
+            coursePublishPreMapper.updateById(coursePublishPre);
+        }
+        // 更新课程基本信息表的审核状态为已提交
+        courseBase.setAuditStatus("202003");
+        courseBaseMapper.updateById(courseBase);
     }
 
 }
