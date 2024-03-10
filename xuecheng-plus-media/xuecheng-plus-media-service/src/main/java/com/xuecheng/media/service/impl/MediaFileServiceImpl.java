@@ -92,7 +92,7 @@ public class MediaFileServiceImpl implements MediaFileService {
     // 因为这方法有通过网络上传文件到minio，可能会很慢，导致数据库阻塞，占用数据库资源，所以不在这里添加@Transactional，而在addMediaFilesToDb添加
     // @Transactional
     @Override
-    public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, MultipartFile file) {
+    public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, MultipartFile file, String objectName) {
 
         // 将文件上传到minio
         // 文件名
@@ -105,7 +105,10 @@ public class MediaFileServiceImpl implements MediaFileService {
         String defaultFolderPath = getDefaultFolderPath();
         // 文件的md5值
         String fileMd5 = getFileMd5(file);
-        String objectName = defaultFolderPath + fileMd5 + extension;
+        // 将文件上传到minio
+        if (objectName == null) {
+            objectName = defaultFolderPath + fileMd5 + extension;
+        }
 
         boolean result = addMediaFilesToMinIO(file, mimeType, bucket_mediafiles, objectName);
         if (!result) {

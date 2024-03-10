@@ -18,6 +18,9 @@ spring:
           - data-id: logging-${spring.profiles.active}.yaml
             group: xuecheng-plus-common
             refresh: true
+          - data-id: feign-${spring.profiles.active}.yaml
+            group: xuecheng-plus-common
+            refresh: true
 #  datasource:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
 #    url: jdbc:mysql://192.168.164.132:3306/xcplus_content?serverTimezone=UTC&userUnicode=true&useSSL=false
