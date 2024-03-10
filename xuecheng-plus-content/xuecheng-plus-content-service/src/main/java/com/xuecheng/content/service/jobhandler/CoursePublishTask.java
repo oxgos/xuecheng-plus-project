@@ -1,5 +1,7 @@
 package com.xuecheng.content.service.jobhandler;
 
+import com.xuecheng.base.exception.XueChengPlusException;
+import com.xuecheng.content.service.CoursePublishService;
 import com.xuecheng.messagesdk.model.po.MqMessage;
 import com.xuecheng.messagesdk.service.MessageProcessAbstract;
 import com.xuecheng.messagesdk.service.MqMessageService;
@@ -8,11 +10,16 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
 public class CoursePublishTask extends MessageProcessAbstract {
+
+    @Resource
+    CoursePublishService coursePublishService;
 
     //任务调度入口
     @XxlJob("CoursePublishJobHandler")
@@ -34,9 +41,9 @@ public class CoursePublishTask extends MessageProcessAbstract {
         // 课程静态化上传到minio
         generateCourseHtml(mqMessage, courseId);
         // 向elasticsearch写索引数据
-        saveCourseIndex(mqMessage, courseId);
+//        saveCourseIndex(mqMessage, courseId);
         // 向redis写缓存
-        saveCourseCache(mqMessage, courseId);
+//        saveCourseCache(mqMessage, courseId);
         return true;
     }
 
@@ -50,15 +57,18 @@ public class CoursePublishTask extends MessageProcessAbstract {
         MqMessageService mqMessageService = this.getMqMessageService();
         //消息幂等性处理
         int stageOne = mqMessageService.getStageOne(id);
-        if (stageOne > 0) {
+        if (stageOne == 1) {
             log.debug("课程静态化已处理直接返回，课程id:{}", courseId);
             return;
         }
-        try {
-            TimeUnit.SECONDS.sleep(10);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        //生成静态化页面
+        File file = coursePublishService.generateCourseHtml(courseId);
+        if (file == null) {
+            XueChengPlusException.cast("生成的静态页面为空");
         }
+        //上传静态化页面
+        coursePublishService.uploadCourseHtml(courseId, file);
+
         //保存第一阶段状态
         mqMessageService.completedStageOne(id);
 
