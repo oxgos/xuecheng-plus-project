@@ -1,4 +1,4 @@
-package com.xuecheng.content.components;
+package com.xuecheng.content.feignclient;
 
 import com.xuecheng.content.feignclient.MediaServiceClient;
 import feign.hystrix.FallbackFactory;
