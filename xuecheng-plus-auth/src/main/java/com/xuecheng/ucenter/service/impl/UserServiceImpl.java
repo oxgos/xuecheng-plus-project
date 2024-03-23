@@ -42,29 +42,33 @@ public class UserServiceImpl implements UserDetailsService {
             throw new RuntimeException("认证请求数据格式不对");
         }
         String authType = authParamsDto.getAuthType();
-        AuthService authService = applicationContext.getBean(authType + "_authService", AuthService.class);
-        XcUserExt execute = authService.execute(authParamsDto);
 
-
-        String username = authParamsDto.getUsername();
-
-        XcUser user = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, username));
-        if (user == null) {
-            //返回空表示用户不存在
-            return null;
+        if (authType == null) {
+            throw new RuntimeException("认证请求缺少校验方式参数authType");
         }
-        //取出数据库存储的正确密码
-        String password = user.getPassword();
-        // 扩展用户信息到JWT
-        // 为了安全在令牌中不放密码
-        user.setPassword(null);
-        // user转json字符串
-        String userJson = JSON.toJSONString(user);
+        // 利用策略模式，根据authType获取不同的ServiceBean
+        AuthService authService = applicationContext.getBean(authType + "_authService", AuthService.class);
 
+        XcUserExt user = authService.execute(authParamsDto);
+
+        return getUserPrincipal(user);
+    }
+
+    /**
+     * @param user 用户id，主键
+     * @return com.xuecheng.ucenter.model.po.XcUser 用户信息
+     * @description 查询用户信息
+     */
+    public UserDetails getUserPrincipal(XcUserExt user) {
         //用户权限,如果不加报Cannot pass a null GrantedAuthority collection
-        String[] authorities = {"test"};
-        //创建UserDetails对象,权限信息待实现授权功能时再向UserDetail中加入
-        UserDetails userDetails = User.withUsername(userJson).password(password).authorities(authorities).build();
+        String[] authorities = {"p1"};
+        String password = user.getPassword();
+        //为了安全在令牌中不放密码
+        user.setPassword(null);
+        //将user对象转json
+        String userString = JSON.toJSONString(user);
+        //创建UserDetails对象
+        UserDetails userDetails = User.withUsername(userString).password(password).authorities(authorities).build();
         return userDetails;
     }
 }
