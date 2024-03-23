@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * @author Mr.M
- * @description 媒资管理服务远程接口
+ * @description  媒资管理服务远程接口
  */
 @FeignClient(value = "media-api", configuration = MultipartSupportConfig.class, fallbackFactory = MediaServiceClientFallbackFactory.class)
 public interface MediaServiceClient {
