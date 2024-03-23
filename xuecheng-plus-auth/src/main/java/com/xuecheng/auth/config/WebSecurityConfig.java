@@ -2,16 +2,15 @@ package com.xuecheng.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
+import javax.annotation.Resource;
 
 /**
  * @description 安全管理配置
@@ -19,6 +18,9 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Resource
+    DaoAuthenticationProviderCustom daoAuthenticationProviderCustom;
 
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -41,6 +43,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // return NoOpPasswordEncoder.getInstance();
         // 密码加码方式
         return new BCryptPasswordEncoder();
+    }
+
+    // 配置自定义的认证管理器daoAuthenticationProvider
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(daoAuthenticationProviderCustom);
     }
 
     //配置安全拦截机制
