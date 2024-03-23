@@ -1,0 +1,41 @@
+package com.xuecheng.content.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+
+/**
+ * @description 资源服务配置
+ */
+@Configuration
+@EnableResourceServer
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+public class ResouceServerConfig extends ResourceServerConfigurerAdapter {
+    // 资源服务标识(需与授权服务一致)
+    public static final String RESOURCE_ID = "xuecheng-plus";
+
+    @Autowired
+    TokenStore tokenStore;
+
+    @Override
+    public void configure(ResourceServerSecurityConfigurer resources) {
+        resources.resourceId(RESOURCE_ID)//资源 id
+                .tokenStore(tokenStore)
+                .stateless(true);
+    }
+
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable()
+                .authorizeRequests()
+                // 所有/r/**,/course/**的请求必须认证通过, 如果网关认证了，这里不必再认证
+                // .antMatchers("/r/**", "/course/**").authen t icated()
+                .anyRequest().permitAll() // 其他均允许
+        ;
+    }
+}
