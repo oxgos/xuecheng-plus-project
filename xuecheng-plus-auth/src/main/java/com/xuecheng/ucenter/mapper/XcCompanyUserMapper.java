@@ -8,7 +8,6 @@ import com.xuecheng.ucenter.model.po.XcCompanyUser;
  *  Mapper 接口
  * </p>
  *
- * @author itcast
  */
 public interface XcCompanyUserMapper extends BaseMapper<XcCompanyUser> {
 

@@ -5,9 +5,6 @@ import lombok.ToString;
 
 /**
  * @description 通用结果类型
- * @author Mr.M
- * @date 2022/9/13 14:44
- * @version 1.0
  */
 
  @Data
