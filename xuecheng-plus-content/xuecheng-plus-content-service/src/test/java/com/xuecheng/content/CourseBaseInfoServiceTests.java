@@ -28,7 +28,7 @@ public class CourseBaseInfoServiceTests {
         QueryCourseParamsDto queryCourseParamsDto = new QueryCourseParamsDto();
         queryCourseParamsDto.setCourseName("java");
         queryCourseParamsDto.setAuditStatus("202004"); // 202004表示课程审核通过
-        PageResult<CourseBase> pageResult = courseBaseInfoService.queryCourseBaseList(pageParams, queryCourseParamsDto);
+        PageResult<CourseBase> pageResult = courseBaseInfoService.queryCourseBaseList(null, pageParams, queryCourseParamsDto);
         System.out.println(pageResult);
     }
 

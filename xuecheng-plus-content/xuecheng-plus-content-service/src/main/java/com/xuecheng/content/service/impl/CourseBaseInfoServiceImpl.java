@@ -52,7 +52,7 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     CourseTeacherServiceImpl courseTeacherService;
 
     @Override
-    public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
+    public PageResult<CourseBase> queryCourseBaseList(Long companyId, PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
         // 详细进行分页查询的单元测试
         // 拼装查询条件
         LambdaQueryWrapper<CourseBase> queryWrapper = new LambdaQueryWrapper<>();
@@ -75,6 +75,7 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
                     CourseBase::getStatus,
                     queryCourseParamsDto.getPublishStatus()
             );
+            queryWrapper.eq(CourseBase::getCompanyId, companyId);
         }
         // 创建page分页参数对象,参数：当前页码，每页记录数
         Page<CourseBase> page = new Page(pageParams.getPageNo(), pageParams.getPageSize());
