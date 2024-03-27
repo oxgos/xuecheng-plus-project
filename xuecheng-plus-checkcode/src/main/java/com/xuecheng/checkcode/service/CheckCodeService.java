@@ -18,7 +18,21 @@ public interface CheckCodeService {
      * @param checkCodeParamsDto 生成验证码参数
      * @return com.xuecheng.checkcode.model.CheckCodeResultDto 验证码结果
     */
-     CheckCodeResultDto generate(CheckCodeParamsDto checkCodeParamsDto);
+     CheckCodeResultDto generateCheckCode(CheckCodeParamsDto checkCodeParamsDto);
+
+    /**
+     * @description 生成手机验证码
+     * @param checkCodeParamsDto 生成验证码参数
+     * @return com.xuecheng.checkcode.model.CheckCodeResultDto 验证码结果
+    */
+     CheckCodeResultDto generatePhoneCode(CheckCodeParamsDto checkCodeParamsDto);
+
+    /**
+     * @description 生成邮件验证码
+     * @param checkCodeParamsDto 生成验证码参数
+     * @return com.xuecheng.checkcode.model.CheckCodeResultDto 验证码结果
+    */
+     CheckCodeResultDto generateEmailCode(CheckCodeParamsDto checkCodeParamsDto);
 
      /**
       * @description 校验验证码

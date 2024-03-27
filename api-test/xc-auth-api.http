@@ -12,3 +12,23 @@ POST {{auth_host}}/auth/oauth/check_token?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX
 ################扩展认证请求参数后######################
 ###密码模式
 POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&grant_type=password&username={"username":"stu1","authType":"password","password":"111111"}
+
+### 重置密码
+POST {{auth_host}}/auth/findpassword
+Content-Type: application/json
+
+{
+  "cellphone": "123",
+  "email": "",
+  "checkcodekey": "",
+  "checkcode": "123",
+  "confirmpwd": "123",
+  "password": "123"
+}
+
+### 微信返回
+GET {{auth_host}}/auth/wxLogin
+
+### 测试
+GET {{auth_host}}/auth/login-success
+

@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
         BindingResult bindingResult = e.getBindingResult();
         // 存储错误信息
         List<String> errors = new ArrayList<>();
-        bindingResult.getFieldErrors().stream().forEach(item -> {
+        bindingResult.getAllErrors().stream().forEach(item -> {
             errors.add(item.getDefaultMessage());
         });
 
@@ -62,4 +62,5 @@ public class GlobalExceptionHandler {
         return new RestErrorResponse(errMessage);
 
     }
+
 }

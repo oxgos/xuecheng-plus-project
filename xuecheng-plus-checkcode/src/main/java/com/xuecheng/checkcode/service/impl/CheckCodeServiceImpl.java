@@ -6,6 +6,7 @@ import com.xuecheng.checkcode.model.CheckCodeParamsDto;
 import com.xuecheng.checkcode.model.CheckCodeResultDto;
 import com.xuecheng.checkcode.service.AbstractCheckCodeService;
 import com.xuecheng.checkcode.service.CheckCodeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sun.misc.BASE64Encoder;
@@ -17,13 +18,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * @author Mr.M
- * @version 1.0
  * @description 图片验证码生成器
- * @date 2022/9/29 16:16
  */
-@Service("PicCheckCodeService")
-public class PicCheckCodeServiceImpl extends AbstractCheckCodeService implements CheckCodeService {
+@Slf4j
+@Service("CheckCodeService")
+public class CheckCodeServiceImpl extends AbstractCheckCodeService implements CheckCodeService {
 
 
     @Autowired
@@ -50,7 +49,7 @@ public class PicCheckCodeServiceImpl extends AbstractCheckCodeService implements
 
 
     @Override
-    public CheckCodeResultDto generate(CheckCodeParamsDto checkCodeParamsDto) {
+    public CheckCodeResultDto generateCheckCode(CheckCodeParamsDto checkCodeParamsDto) {
         GenerateResult generate = generate(checkCodeParamsDto, 4, "checkcode:", 300);
         String key = generate.getKey();
         String code = generate.getCode();
@@ -59,7 +58,28 @@ public class PicCheckCodeServiceImpl extends AbstractCheckCodeService implements
         checkCodeResultDto.setAliasing(pic);
         checkCodeResultDto.setKey(key);
         return checkCodeResultDto;
+    }
 
+    @Override
+    public CheckCodeResultDto generatePhoneCode(CheckCodeParamsDto checkCodeParamsDto) {
+        GenerateResult generate = generate(checkCodeParamsDto, 6, "phonecode:", 300);
+        String key = generate.getKey();
+        String code = generate.getCode();
+        log.debug("手机验证码:{}", code);
+        CheckCodeResultDto checkCodeResultDto = new CheckCodeResultDto();
+        checkCodeResultDto.setKey(key);
+        return checkCodeResultDto;
+    }
+
+    @Override
+    public CheckCodeResultDto generateEmailCode(CheckCodeParamsDto checkCodeParamsDto) {
+        GenerateResult generate = generate(checkCodeParamsDto, 6, "emailcode:", 300);
+        String key = generate.getKey();
+        String code = generate.getCode();
+        log.debug("邮箱验证码:{}", code);
+        CheckCodeResultDto checkCodeResultDto = new CheckCodeResultDto();
+        checkCodeResultDto.setKey(key);
+        return checkCodeResultDto;
     }
 
     private String createPic(String code) {

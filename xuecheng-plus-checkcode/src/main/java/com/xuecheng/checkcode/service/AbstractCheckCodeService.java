@@ -28,8 +28,6 @@ public abstract class AbstractCheckCodeService implements CheckCodeService {
      * @param keyPrefix key的前缀
      * @param expire 过期时间
      * @return com.xuecheng.checkcode.service.AbstractCheckCodeService.GenerateResult 生成结果
-     * @author Mr.M
-     * @date 2022/9/30 6:07
     */
     public GenerateResult generate(CheckCodeParamsDto checkCodeParamsDto,Integer code_length,String keyPrefix,Integer expire){
         //生成四位验证码
@@ -53,8 +51,6 @@ public abstract class AbstractCheckCodeService implements CheckCodeService {
         String code;
     }
 
-
-    public abstract CheckCodeResultDto generate(CheckCodeParamsDto checkCodeParamsDto);
 
 
     public boolean verify(String key, String code){

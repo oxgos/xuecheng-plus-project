@@ -1,5 +1,11 @@
 ### 申请验证码
 POST {{checkcode_host}}/checkcode/pic
 
+### 手机申请验证码
+POST {{checkcode_host}}/checkcode/phone?param1=
+
+### 邮箱申请验证码
+POST {{gateway_host}}/checkcode/phone?param1=oxgoss@163.com
+
 ### 校验验证码
 POST {{checkcode_host}}/checkcode/verify?key=checkcode:1f816b4514584c1da3c20b555c1193a9&code=QBFJ
