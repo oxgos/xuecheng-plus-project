@@ -152,6 +152,9 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         CourseMarket courseMarketNew = new CourseMarket();
         // 将页面输入的数据拷贝到courseMarketNew
         BeanUtils.copyProperties(dto, courseMarketNew);
+        if (dto.getValidDays() == null) {
+            courseMarketNew.setValidDays(365);
+        }
         // 主键课程的id
         Long courseId = courseBaseNew.getId(); // mybatis-plus插入成功之后就会有id, 如果不是,则需要在xml添加额外配置
         courseMarketNew.setId(courseId);

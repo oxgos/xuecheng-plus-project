@@ -1,6 +1,7 @@
 package com.xuecheng.content.service;
 
 import com.xuecheng.content.model.dto.CoursePreviewDto;
+import com.xuecheng.content.model.po.CoursePublish;
 import freemarker.template.TemplateException;
 
 import java.io.File;
@@ -43,4 +44,11 @@ public interface CoursePublishService {
      * @description 上传课程静态化页面
      */
     public void uploadCourseHtml(Long courseId, File file);
+
+    /**
+     * 获取已发布课程信息
+     * @param courseId
+     * @return
+     */
+    public CoursePublish getCoursePublish(Long courseId);
 }

@@ -60,3 +60,6 @@ Content-Type: application/json
 ### 删除课程
 DELETE {{content_host}}/content/course/26
 Content-Type: application/json
+
+### 查询已发布课程
+GET {{content_host}}/content/r/coursepublish/121

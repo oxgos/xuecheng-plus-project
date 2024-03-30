@@ -34,7 +34,7 @@ public class ResouceServerConfig extends ResourceServerConfigurerAdapter {
         http.csrf().disable()
                 .authorizeRequests()
                 // 所有/r/**,/course/**的请求必须认证通过, 如果网关认证了，这里不必再认证
-                // .antMatchers("/r/**", "/course/**").authen t icated()
+                // .antMatchers("/r/**", "/course/**").authenticated()
                 .anyRequest().permitAll() // 其他均允许
         ;
     }
