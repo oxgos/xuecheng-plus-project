@@ -4,10 +4,7 @@ import lombok.Data;
 import lombok.ToString;
 
 /**
- * @author Mr.M
- * @version 1.0
  * @description 创建商品订单
- * @date 2022/10/4 10:21
  */
 @Data
 @ToString

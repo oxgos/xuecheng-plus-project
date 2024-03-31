@@ -9,9 +9,11 @@ import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipay.api.response.AlipayTradePagePayResponse;
 import com.xuecheng.orders.config.AlipayCustomConfig;
+import io.swagger.annotations.ApiOperation;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -155,7 +157,6 @@ public class PayController {
         }
     }
 
-    @NotNull
     private AlipayConfig getAlipayConfig() {
         AlipayConfig alipayConfig = new AlipayConfig();
         alipayConfig.setServerUrl(AlipayCustomConfig.URL);
