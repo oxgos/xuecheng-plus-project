@@ -1,3 +1,3 @@
 ### 测试
-GET {{orders_host}}/orders/requestpay
+GET {{orders_host}}/orders/alipaytest
 
