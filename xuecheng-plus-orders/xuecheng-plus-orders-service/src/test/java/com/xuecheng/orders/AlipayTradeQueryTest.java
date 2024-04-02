@@ -1,6 +1,7 @@
 package com.xuecheng.orders;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.AlipayConfig;
@@ -8,34 +9,29 @@ import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.response.AlipayTradeQueryResponse;
-import com.xuecheng.orders.config.AlipayCustomConfig;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import javax.annotation.Resource;
+import java.util.Map;
 
 @SpringBootTest
 public class AlipayTradeQueryTest {
 
-    @Value("${pay.alipay.APP_ID}")
-    String APP_ID;
-
-    @Value("${pay.alipay.APP_PRIVATE_KEY}")
-    String APP_PRIVATE_KEY;
-
-    @Value("${pay.alipay.ALIPAY_PUBLIC_KEY}")
-    String ALIPAY_PUBLIC_KEY;
+    @Resource
+    AlipayConfig alipayConfig;
 
     @Test
     public void AlipayTradeQuery() throws AlipayApiException {
         // 初始化SDK
-        AlipayClient alipayClient = new DefaultAlipayClient(getAlipayConfig());
+        AlipayClient alipayClient = new DefaultAlipayClient(alipayConfig);
 
         // 构造请求参数以调用接口
         AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
         AlipayTradeQueryModel model = new AlipayTradeQueryModel();
 
         // 设置订单支付时传入的商户订单号
-        model.setOutTradeNo("20210817010101004");
+        model.setOutTradeNo("1774818719167922176");
 
         // 设置查询选项
 //        List<String> queryOptions = new ArrayList<String>();
@@ -47,7 +43,12 @@ public class AlipayTradeQueryTest {
 
         request.setBizModel(model);
         AlipayTradeQueryResponse response = alipayClient.execute(request);
-        System.out.println(response.getBody());
+        String body = response.getBody();
+        Map<String, ?> map = JSON.parseObject(body, Map.class);
+        Map<String, Object> alipay_trade_query_response = (Map<String, Object>) map.get("alipay_trade_query_response");
+        String total_amount = (String) alipay_trade_query_response.get("total_amount");
+        String trade_status = (String) alipay_trade_query_response.get("trade_status");
+        String trade_no = (String) alipay_trade_query_response.get("trade_no");
 
         if (response.isSuccess()) {
             System.out.println("调用成功");
@@ -59,16 +60,4 @@ public class AlipayTradeQueryTest {
         }
     }
 
-    private AlipayConfig getAlipayConfig() {
-        AlipayConfig alipayConfig = new AlipayConfig();
-        alipayConfig.setServerUrl(AlipayCustomConfig.URL);
-        alipayConfig.setAppId(APP_ID);
-        alipayConfig.setPrivateKey(APP_PRIVATE_KEY);
-        alipayConfig.setFormat(AlipayCustomConfig.FORMAT);
-        alipayConfig.setCharset(AlipayCustomConfig.CHARSET);
-        System.out.println(ALIPAY_PUBLIC_KEY);
-        alipayConfig.setAlipayPublicKey(ALIPAY_PUBLIC_KEY);
-        alipayConfig.setSignType(AlipayCustomConfig.SIGNTYPE);
-        return alipayConfig;
-    }
 }

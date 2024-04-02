@@ -9,13 +9,6 @@ import lombok.ToString;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-/**
- * <p>
- * 
- * </p>
- *
- * @author itcast
- */
 @Data
 @ToString
 @TableName("xc_orders")

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -27,25 +28,20 @@ import java.util.Map;
 @Controller
 public class PayController {
 
-    @Value("${pay.alipay.APP_ID}")
-    String APP_ID;
-
-    @Value("${pay.alipay.APP_PRIVATE_KEY}")
-    String APP_PRIVATE_KEY;
-
-    @Value("${pay.alipay.ALIPAY_PUBLIC_KEY}")
-    String ALIPAY_PUBLIC_KEY;
+    @Resource
+    AlipayCustomConfig alipayCustomConfig;
+    @Resource
+    AlipayConfig alipayConfig;
 
 
     @RequestMapping("/alipaytest")
     public void doPost(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws AlipayApiException, IOException {
-        AlipayConfig alipayConfig = getAlipayConfig();
         // 构造client
         AlipayClient alipayClient = new DefaultAlipayClient(alipayConfig);
 
         AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
         // 异步接收地址，仅支持http/https，公网可访问
-        request.setNotifyUrl("http://192.168.0.102:63030/orders/paynotify");
+        request.setNotifyUrl("http://192.168.0.7:63030/orders/paynotify");
         // 同步跳转地址，仅支持http/https
 //        request.setReturnUrl("");
         /******必传参数******/
@@ -83,7 +79,7 @@ public class PayController {
 //        AlipayTradePagePayResponse response = alipayClient.pageExecute(request, "GET");
         String pageRedirectionData = response.getBody();
         System.out.println(pageRedirectionData);
-        httpResponse.setContentType("text/html;charset=" + AlipayCustomConfig.CHARSET);
+        httpResponse.setContentType("text/html;charset=" + alipayCustomConfig.getCHARSET());
         httpResponse.getWriter().write(pageRedirectionData); // 直接将完整的表单html输出到页面
         httpResponse.getWriter().flush();
 
@@ -96,7 +92,7 @@ public class PayController {
     }
 
     //接收通知
-    @PostMapping("/paynotify")
+    @PostMapping("/paynotifytest")
     public void paynotify(HttpServletRequest request,HttpServletResponse response) throws IOException, AlipayApiException {
         Map<String,String> params = new HashMap<String,String>();
         Map requestParams = request.getParameterMap();
@@ -116,19 +112,19 @@ public class PayController {
 
         //获取支付宝的通知返回参数，可参考技术文档中页面跳转同步通知参数列表(以上仅供参考)//
         //计算得出通知验证结果
-        boolean verify_result = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, AlipayCustomConfig.CHARSET, AlipayCustomConfig.SIGNTYPE);
+        boolean verify_result = AlipaySignature.rsaCheckV1(params, alipayCustomConfig.getALIPAY_PUBLIC_KEY(), alipayCustomConfig.getCHARSET(), alipayCustomConfig.getSIGNTYPE());
 
         if(verify_result) {//验证成功
             //请在这里加上商户的业务逻辑程序代码
 
             //商户订单号
-            String out_trade_no = new String(request.getParameter("out_trade_no").getBytes("ISO-8859-1"),AlipayCustomConfig.CHARSET);
+            String out_trade_no = new String(request.getParameter("out_trade_no").getBytes("ISO-8859-1"),alipayCustomConfig.getCHARSET());
             //支付宝交易号
 
-            String trade_no = new String(request.getParameter("trade_no").getBytes("ISO-8859-1"),AlipayCustomConfig.CHARSET);
+            String trade_no = new String(request.getParameter("trade_no").getBytes("ISO-8859-1"),alipayCustomConfig.getCHARSET());
 
             //交易状态
-            String trade_status = new String(request.getParameter("trade_status").getBytes("ISO-8859-1"),AlipayCustomConfig.CHARSET);
+            String trade_status = new String(request.getParameter("trade_status").getBytes("ISO-8859-1"),alipayCustomConfig.getCHARSET());
 
 
             //——请根据您的业务逻辑来编写程序（以下代码仅作参考）——
@@ -157,16 +153,5 @@ public class PayController {
         }
     }
 
-    private AlipayConfig getAlipayConfig() {
-        AlipayConfig alipayConfig = new AlipayConfig();
-        alipayConfig.setServerUrl(AlipayCustomConfig.URL);
-        alipayConfig.setAppId(APP_ID);
-        alipayConfig.setPrivateKey(APP_PRIVATE_KEY);
-        alipayConfig.setFormat(AlipayCustomConfig.FORMAT);
-        alipayConfig.setCharset(AlipayCustomConfig.CHARSET);
-        alipayConfig.setAlipayPublicKey(ALIPAY_PUBLIC_KEY);
-        alipayConfig.setSignType(AlipayCustomConfig.SIGNTYPE);
-        return alipayConfig;
-    }
 
 }

@@ -8,13 +8,6 @@ import lombok.ToString;
 
 import java.io.Serializable;
 
-/**
- * <p>
- * 
- * </p>
- *
- * @author itcast
- */
 @Data
 @ToString
 @TableName("xc_orders_goods")
