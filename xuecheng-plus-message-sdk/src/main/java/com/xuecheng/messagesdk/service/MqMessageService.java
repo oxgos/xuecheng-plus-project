@@ -21,8 +21,6 @@ public interface MqMessageService extends IService<MqMessage> {
      * @param shardTotal 分片总数
      * @param count 扫描记录数
      * @return java.util.List 消息记录
-     * @author Mr.M
-     * @date 2022/9/21 18:55
      */
     public List<MqMessage> getMessageList(int shardIndex, int shardTotal,  String messageType,int count);
 
@@ -32,16 +30,12 @@ public interface MqMessageService extends IService<MqMessage> {
      * @param businessKey2 业务id
      * @param businessKey3 业务id
      * @return com.xuecheng.messagesdk.model.po.MqMessage 消息内容
-     * @author Mr.M
-     * @date 2022/9/23 13:45
     */
     public MqMessage addMessage(String messageType,String businessKey1,String businessKey2,String businessKey3);
     /**
      * @description 完成任务
      * @param id 消息id
      * @return int 更新成功：1
-     * @author Mr.M
-     * @date 2022/9/21 20:49
      */
     public int completed(long id);
 
@@ -49,8 +43,6 @@ public interface MqMessageService extends IService<MqMessage> {
      * @description 完成阶段任务
      * @param id 消息id
      * @return int 更新成功：1
-     * @author Mr.M
-     * @date 2022/9/21 20:49
      */
     public int completedStageOne(long id);
     public int completedStageTwo(long id);
@@ -61,8 +53,6 @@ public interface MqMessageService extends IService<MqMessage> {
      * @description 查询阶段状态
      * @param id
      * @return int
-     * @author Mr.M
-     * @date 2022/9/21 20:54
     */
     public int getStageOne(long id);
     public int getStageTwo(long id);

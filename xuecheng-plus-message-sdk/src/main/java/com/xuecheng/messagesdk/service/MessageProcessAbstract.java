@@ -9,10 +9,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * @author Mr.M
- * @version 1.0
  * @description 消息处理抽象类
- * @date 2022/9/21 19:44
  */
 @Slf4j
 @Data
@@ -26,8 +23,6 @@ public abstract class MessageProcessAbstract {
      * @param mqMessage 执行任务内容
      * @return boolean true:处理成功，false处理失败
      * @description 任务处理
-     * @author Mr.M
-     * @date 2022/9/21 19:47
      */
     public abstract boolean execute(MqMessage mqMessage);
 
@@ -40,8 +35,6 @@ public abstract class MessageProcessAbstract {
      * @param timeout     预估任务执行时间,到此时间如果任务还没有结束则强制结束 单位秒
      * @return void
      * @description 扫描消息表多线程执行任务
-     * @author Mr.M
-     * @date 2022/9/21 20:35
      */
     public void process(int shardIndex, int shardTotal, String messageType, int count, long timeout) {
 

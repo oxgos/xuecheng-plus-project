@@ -2,7 +2,7 @@
 #微服务配置
 spring:
   application:
-    name: learning-api
+    name: learning-service
   cloud:
     nacos:
       server-addr: 192.168.164.132:8848
