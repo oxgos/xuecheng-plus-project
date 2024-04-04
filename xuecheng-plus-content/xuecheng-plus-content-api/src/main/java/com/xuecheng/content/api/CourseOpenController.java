@@ -17,10 +17,10 @@ import javax.annotation.Resource;
 public class CourseOpenController {
 
     @Resource
-    private CourseBaseInfoService courseBaseInfoService;
+    CourseBaseInfoService courseBaseInfoService;
 
     @Resource
-    private CoursePublishService coursePublishService;
+    CoursePublishService coursePublishService;
 
 
     @GetMapping("/course/whole/{courseId}")
