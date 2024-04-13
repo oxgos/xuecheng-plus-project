@@ -19,16 +19,21 @@ import com.xuecheng.content.service.CourseTeacherService;
 import com.xuecheng.content.service.TeachplanService;
 import com.xuecheng.messagesdk.model.po.MqMessage;
 import com.xuecheng.messagesdk.service.MqMessageService;
+import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -40,6 +45,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @description 课程发布相关接口
@@ -74,6 +81,12 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
     @Resource
     MqMessageService mqMessageService;
+
+    @Resource
+    RedissonClient redissonClient;
+
+    @Resource
+    RedisTemplate redisTemplate;
 
     @Override
     public CoursePreviewDto getCoursePreviewInfo(Long courseId) {
@@ -208,8 +221,12 @@ public class CoursePublishServiceImpl implements CoursePublishService {
             //加载模板
             //选指定模板路径,classpath下templates下
             //得到classpath路径
-            String classpath = this.getClass().getResource("/").getPath();
-            configuration.setDirectoryForTemplateLoading(new File(classpath + "/templates/"));
+//            String classpath = this.getClass().getResource("/").getPath();
+//            configuration.setDirectoryForTemplateLoading(new File(classpath + "/templates/"));
+
+            //更改为如下方式
+            configuration.setTemplateLoader(new ClassTemplateLoader(this.getClass().getClassLoader(), "/templates"));
+
             //设置字符编码
             configuration.setDefaultEncoding("utf-8");
 
@@ -264,12 +281,85 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         return coursePublish;
     }
 
+//    @Override
+//    public CoursePublish getCoursePublishCache(Long courseId) {
+//        String cacheKey = "course_publish_" + courseId;
+//        Object object = redisTemplate.opsForValue().get(cacheKey);
+//        CoursePublish coursePublish;
+//        if (object != null) {
+//            String objectString = object.toString();
+//            if ("null".equals(objectString)) {
+//                return null;
+//            }
+//            coursePublish = JSON.parseObject(objectString, CoursePublish.class);
+//            return coursePublish;
+//        } else {
+//            // 同步锁，防止缓存击穿,只有一个线程执行，其他线程都会阻塞(性能一般)
+//            // 注意锁的范围和粒度，只锁查询数据库代码即可
+//            synchronized (this) {
+//                // 第一个线程查询完数据库，已经把数据缓存，所以其他线程可以读缓存数据，不用查询数据库
+//                object = redisTemplate.opsForValue().get(cacheKey);
+//                if (object != null) {
+//                    String objectString = object.toString();
+//                    if ("null".equals(objectString)) {
+//                        return null;
+//                    }
+//                    coursePublish = JSON.parseObject(objectString, CoursePublish.class);
+//                    return coursePublish;
+//                }
+//                System.out.println("=================从数据库查询=================");
+//                coursePublish = getCoursePublish(courseId);
+//                // 设置不同缓存时间，防止缓存雪崩(同一时间，缓存过期失效)
+//                redisTemplate.opsForValue().set(cacheKey, JSON.toJSONString(coursePublish), 300 + new Random().nextInt(100), TimeUnit.SECONDS);
+//                return coursePublish;
+//            }
+//        }
+//    }
+
+    // Redisson分布式锁
+    public CoursePublish getCoursePublishCache(Long courseId) {
+        //查询缓存
+        String jsonString = (String) redisTemplate.opsForValue().get("course:" + courseId);
+        if (StringUtils.isNotEmpty(jsonString)) {
+            if (jsonString.equals("null")) {
+                return null;
+            }
+            CoursePublish coursePublish = JSON.parseObject(jsonString, CoursePublish.class);
+            return coursePublish;
+        } else {
+            //每门课程设置一个锁
+            RLock lock = redissonClient.getLock("coursequerylock:" + courseId);
+            //获取锁
+            lock.lock();
+            try {
+                jsonString = (String) redisTemplate.opsForValue().get("course:" + courseId);
+                if (StringUtils.isNotEmpty(jsonString)) {
+                    CoursePublish coursePublish = JSON.parseObject(jsonString, CoursePublish.class);
+                    return coursePublish;
+                }
+                System.out.println("=========从数据库查询==========");
+                // 测试看门狗是否会自动续期锁
+//                try {
+//                    Thread.sleep(60000);
+//                } catch (InterruptedException e) {
+//                    throw new RuntimeException(e);
+//                }
+                //从数据库查询
+                CoursePublish coursePublish = getCoursePublish(courseId);
+                redisTemplate.opsForValue().set("course:" + courseId, JSON.toJSONString(coursePublish), 10, TimeUnit.SECONDS);
+                return coursePublish;
+            } finally {
+                //释放锁
+                lock.unlock();
+            }
+        }
+    }
+
+
     /**
      * @param courseId 课程id
      * @return void
      * @description 保存消息表记录
-     * @author Mr.M
-     * @date 2022/9/20 16:32
      */
     private void saveCoursePublishMessage(Long courseId) {
         MqMessage mqMessage = mqMessageService.addMessage("course_publish", String.valueOf(courseId), null, null);
